@@ -24,7 +24,7 @@ import AssignmentForm from '../AssignmentForm/AssignmentForm';
 import { MainTabs } from '../index';
 
 const Main = ({ classData }) => {
-    console.log(classData.members);
+    console.log(classData.assignmentWeightage);
     const members = classData.members;
     const memberEmails = Object.keys(members);
     const memberNos = memberEmails.length;
@@ -46,11 +46,11 @@ const Main = ({ classData }) => {
     const [className, setClassName] = useState(classData.className);
     const [courseName, setCourseName] = useState(classData.courseName);
     const [creditHours, setCreditHours] = useState(classData.creditHours);
-    const [assignmentWeightage, setAssignmentWeightage] = useState(0);
-    const [quizWeightage, setQuizWeightage] = useState(0);
-    const [midsWeightage, setMidsWeightage] = useState(0);
-    const [finalWeightage, setFinalWeightage] = useState(0);
-    const [projectWeightage, setProjectWeightage] = useState(0);
+    const [assignmentWeightage, setAssignmentWeightage] = useState(classData.assignmentWeightage);
+    const [quizWeightage, setQuizWeightage] = useState(classData.quizWeightage);
+    const [midsWeightage, setMidsWeightage] = useState(classData.midsWeightage);
+    const [finalWeightage, setFinalWeightage] = useState(classData.finalWeightage);
+    const [projectWeightage, setProjectWeightage] = useState(classData.projectWeightage);
     const [totalWeightage, setTotalWeightage] = useState(0);
     const [disabled, setDisabled] = useState(true);
     const [postCount, setPostCount] = useState(classData.posts);
@@ -59,7 +59,7 @@ const Main = ({ classData }) => {
     const [assignmentCount, setAssignmentCount] = useState(classData.assignmentNo);
     const [quizCount, setQuizCount] = useState(classData.quizNo);
 
-
+    console.log(classData.call);
 
     const handleCloseAssignment = () => setAssignmentEl(null);
     console.log(postCount);
@@ -136,15 +136,15 @@ const Main = ({ classData }) => {
     }
 
     const handleDelete = async (e) => {
-        await deleteDoc(doc(db, `CreatedClasses/${classOwnerMail}/classes/${classId}`))
+        await deleteDoc(doc(db, `Classes/${classId}`))
         navigate('/');
         console.log("delete command sent");
     }
     const editClass = (e) => {
         e.preventDefault();
         const id = classData.id;
-        const mainDoc = doc(db, `CreatedClasses/${loggedInMail}`);
-        const childDoc = doc(mainDoc, `classes/${id}`);
+        const mainDoc = doc(db, `Classes/${id}`);
+        // const childDoc = doc(mainDoc, `classes/${id}`);
         const docData = {
             owner: loggedInMail,
             className: className,
@@ -157,8 +157,9 @@ const Main = ({ classData }) => {
             },
             id: id
         };
-        setDoc(childDoc, docData, { merge: true });
+        setDoc(mainDoc, docData, { merge: true });
         setEditOpen(false);
+        navigate('/');
     }
     useEffect(() => {
         setTotalWeightage(parseInt(assignmentWeightage) + parseInt(quizWeightage) + parseInt(midsWeightage) + parseInt(finalWeightage) + parseInt(projectWeightage))
@@ -171,8 +172,7 @@ const Main = ({ classData }) => {
     const gradeClass = (e) => {
         e.preventDefault()
         const id = classData.id;
-        const mainDoc = doc(db, `CreatedClasses/${loggedInMail}`);
-        const childDoc = doc(mainDoc, `classes/${id}`);
+        const mainDoc = doc(db, `Classes/${id}`);
         const docData = {
             assignmentWeightage: assignmentWeightage,
             quizWeightage: quizWeightage,
@@ -180,12 +180,12 @@ const Main = ({ classData }) => {
             finalWeightage: finalWeightage,
             projectWeightage: projectWeightage
         }
-        setDoc(childDoc, docData, { merge: true });
-        setAssignmentWeightage(0);
-        setQuizWeightage(0);
-        setMidsWeightage(0);
-        setFinalWeightage(0);
-        setProjectWeightage(0);
+        setDoc(mainDoc, docData, { merge: true });
+        // setAssignmentWeightage(0);
+        // setQuizWeightage(0);
+        // setMidsWeightage(0);
+        // setFinalWeightage(0);
+        // setProjectWeightage(0);
         setGradeOpen(false);
     }
 
@@ -347,7 +347,7 @@ const Main = ({ classData }) => {
                         <div className="border-2 p-4 flex flex-col items-center gap-2 rounded-md">
                             <h1 className='text-md font-semibold'>AU Meet</h1>
                             {classData.call ? (
-                                <Link onClick={() => setCallClass(classData.id)} to={`${callLink}`} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Join Now</Link>
+                                <Link onClick={() => setCallClass(classData.id)} to={classData.call} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Join Now</Link>
                             ) : (
                                 <Link to='/call' onClick={() => setCallClass(classData.id)} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Create Now</Link>
                             )}

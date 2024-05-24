@@ -46,7 +46,7 @@ export default function Signup() {
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            dispatch(setUser({ id: user.uid, email: user.email,displayName:userCredentials.userName,id: userCredentials.studentId }));
+            dispatch(setUser({ id: user.uid, email: user.email,displayName:userCredentials.userName,regId: userCredentials.studentId }));
             navigate('/');
         }
         else {

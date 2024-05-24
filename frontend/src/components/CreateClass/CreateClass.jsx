@@ -24,7 +24,13 @@ const createClass = () => {
             assignmentNo:0,
             quizNo:0,
             posts:0,
-            members:{[loggedInMail]:true}
+            call:null,
+            members:{[loggedInMail]:true},
+            assignmentWeightage:0,
+            quizWeightage:0,
+            midsWeightage:0,
+            finalWeightage:0,
+            projectWeightage:0
         };
         const time= Timestamp.fromDate(new Date());
         const mainDoc = doc(db, `UserClasses/${loggedInMail}`);

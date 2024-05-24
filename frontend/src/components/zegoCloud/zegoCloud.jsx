@@ -57,14 +57,11 @@ export default function ZegoCLoud() {
     });
 
 
-    const mainDoc = doc(db, `Calls/${callClass}`);
-    const childDoc= doc(mainDoc, 'callLink/byOwner');
+    const mainDoc = doc(db, `Classes/${callClass}`);
     function getTextStartingWithCall(url) {
       if (url && url.includes("/call")) {
-        // If the URL contains "/call", return the substring starting from "/call"
         return url.substring(url.indexOf("/call"));
       } else {
-        // If "/call" is not found, return null or any default value as needed
         return null;
       }
     }
@@ -72,7 +69,7 @@ export default function ZegoCLoud() {
     const callLink = getTextStartingWithCall(sentence);
     console.log(callClass);
 
-    await setDoc(childDoc,{
+    await setDoc(mainDoc,{
       call: callLink
     },{merge:true})
   };
