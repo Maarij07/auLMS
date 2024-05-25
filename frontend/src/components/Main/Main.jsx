@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { storage } from '../../lib/firebase';
 import { getDownloadURL, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
 import { useLocalContext } from '../../context/context';
-import { collection, deleteDoc, doc, setDoc, Timestamp, addDoc, onSnapshot, query, where, getDocs } from 'firebase/firestore';
+import { collection, deleteDoc, doc, setDoc, Timestamp, addDoc, onSnapshot, query, where, getDocs, getDoc, updateDoc } from 'firebase/firestore';
 import db from '../../lib/firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoMdMore } from "react-icons/io";
@@ -192,24 +192,36 @@ const Main = ({ classData }) => {
     const leaveClass = async (e) => {
         e.preventDefault();
 
-        // Check if classData is defined and has an id property
-        if (classData && classData.id) {
-            const id = classData.id;
-            const mainDoc = doc(db, `JoinedClasses/${loggedInMail}`);
-            const childDoc = doc(mainDoc, `classes/${id}`);
+        try {
+            const userJoinedClassRef = doc(db, `UserClasses/${loggedInMail}/joinedClasses/${classData.id}`);
 
-            try {
-                deleteDoc(childDoc);
+            await deleteDoc(userJoinedClassRef);
+
+            const classRef = doc(db, `Classes/${classData.id}`);
+            const classDoc = await getDoc(classRef);
+
+            if (classDoc.exists()) {
+                // Get the current members array
+                const currentMembers = classDoc.data().members;
+                const modifiedEmail = loggedInMail.replace(/\./g, "_");
+                console.log(modifiedEmail);
+                console.log(currentMembers[modifiedEmail]);
+
+                // // Remove the user's email from the members array
+                delete currentMembers[modifiedEmail];
+
+                // // Update the class document with the modified members array
+                await updateDoc(classRef, { members: currentMembers });
+
                 console.log("Class left successfully");
                 navigate('/');
-            } catch (error) {
-                console.error("Error leaving class:", error);
+            } else {
+                console.error("Class document does not exist");
             }
-        } else {
-            console.error("classData is not defined or does not have an id property");
+        } catch (error) {
+            console.error("Error leaving class:", error);
         }
     };
-
 
     useEffect(() => {
         const callRef = collection(db, `Classes`);
@@ -287,7 +299,7 @@ const Main = ({ classData }) => {
         },
         { id: 'classWork', title: 'Classwork', content: <p>Content for Classwork</p> },
         {
-            id: 'people', title: `People (${memberNos})`, content:
+            id: 'people', title: `Students (${memberNos - 1})`, content:
                 <div className="flex flex-col gap-4 overflow-hidden">
                     <div className="w-full flex flex-col gap-2 sm:w-[53rem] ">
                         <People classData={memberEmails} />

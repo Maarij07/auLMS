@@ -79,9 +79,17 @@ const Groups = ({ classData }) => {
         setUserGroup(null);  // Update local state
     };
 
+    // Delete a group (Only for class creator)
+    const handleDeleteGroup = async (group) => {
+        const groupDocRef = doc(db, `Classes/${classData.id}/Groups/${group.id}`);
+        await deleteDoc(groupDocRef);
+    };
+
     return (
         <div className='sm:w-[53rem]'>
-            <Button onClick={() => setOpen(true)} disabled={!!userGroup}>Create Group</Button>
+            {classData.creator !== loggedInMail && (
+                <Button onClick={() => setOpen(true)} disabled={!!userGroup}>Create Group</Button>
+            )}
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>Create a New Group</DialogTitle>
                 <TextField label="Group Name" value={groupName} onChange={(e) => setGroupName(e.target.value)} />
@@ -106,13 +114,17 @@ const Groups = ({ classData }) => {
                                 <li className='list-disc text-sm' key={index}>{member}</li>
                             ))}
                         </div>
-                        {group.members.includes(loggedInMail) ? (
+                        {classData.creator !== loggedInMail && group.members.includes(loggedInMail) && (
                             <>
                                 <p>You are a member of this group</p>
                                 <Button onClick={() => handleLeaveGroup(group)}>Leave Group</Button>
                             </>
-                        ) : (
+                        )}
+                        {classData.creator !== loggedInMail && !group.members.includes(loggedInMail) && (
                             <Button onClick={() => handleJoinGroup(group)} disabled={!!userGroup}>Join Group</Button>
+                        )}
+                        {classData.creator === loggedInMail && (
+                            <Button onClick={() => handleDeleteGroup(group)}>Delete Group</Button>
                         )}
                     </div>
                 ))}
