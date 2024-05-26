@@ -5,13 +5,14 @@ import { Close } from '@mui/icons-material';
 import img1 from '../../assets/assignment1.svg';
 import img2 from '../../assets/assignment2.svg';
 import db, { storage } from '../../lib/firebase';
+import img from "/logo2.png";
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection, doc, Timestamp, setDoc } from 'firebase/firestore'; // Imports for firestore
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-const ProjectForm = ({classData}) => {
+const ProjectForm = ({ classData }) => {
     const { projectDialog, setProjectDialog, loggedInMail } = useLocalContext();
     const [projectName, setProjectName] = useState('');
     const [marks, setMarks] = useState('');
@@ -59,13 +60,17 @@ const ProjectForm = ({classData}) => {
     return (
 
         <Dialog fullScreen open={projectDialog} onClose={() => setProjectDialog(false)} TransitionComponent={Transition}>
-            <div className="flex w-full justify-between p-4 border-b-2 border-[#cfcecd] shadow-sm" >
+            <div className="flex w-full justify-between px-4 items-center border-b-2 border-[#cfcecd] shadow-sm" >
                 <div className="joinClass cursor-pointer" onClick={() => setProjectDialog(false)}>
                     <Close />
                 </div>
-                {/* <Button onClick={() => { }} className='font-bold' variant="contained" color="primary">
-                            Assign
-                        </Button> */}
+                <div className="flex items-center justify-center">
+                    <img src={img} className='sm:mt-2' alt="" width={50} />
+                    <p className='font-bold text-2xl'>AU Classroom</p>
+                </div>
+                <div className="">
+
+                </div>
             </div>
             <form onSubmit={handleSubmit} className='flex flex-col mt-[4rem] mx-[7rem] gap-4'>
                 <h1 className='text-3xl font-bold'>Time for a Project</h1>

@@ -20,3 +20,8 @@ export {default as MainTabs} from './MainTabs/MainTabs.jsx';
 export {default as PageNotFound} from './PageNotFound/PageNotFound.jsx';
 export {default as People} from './People/People.jsx';
 export {default as QuizForm} from './QuizForm/QuizForm.jsx';
+export {default as Assignments} from './Assignments/Assignments.jsx';
+export {default as Quiz} from './Quiz/Quiz.jsx';
+export {default as Mids} from './Mids/Mids.jsx';
+export {default as Finals} from './Finals/Finals.jsx';
+export {default as Projects} from './Projects/Projects.jsx';

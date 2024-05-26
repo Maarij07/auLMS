@@ -13,7 +13,7 @@ function App() {
   const { loggedInMail } = useLocalContext();
   const [createdClasses, setCreatedClasses] = useState([]);
   const [joinedClasses, setJoinedClasses] = useState([]);
-  const [classData, setClassData] = useState({});
+  const [classData, setClassData] = useState([]);
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -92,7 +92,7 @@ function App() {
     return (
       <BrowserRouter>
         <Routes>
-          {classData.map((item) => (
+          {classData?.map((item) => (
             <Route key={item.id} exact path={`/${item.id}`} element={<Main classData={item} />} />
           ))}
           <Route index element={<Home />} />

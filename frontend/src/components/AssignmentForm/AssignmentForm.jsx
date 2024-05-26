@@ -29,6 +29,7 @@ const AssignmentForm = ({ classData }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const fileName=file?.name;
 
         let downloadURL = '';
         if (file) {
@@ -45,6 +46,7 @@ const AssignmentForm = ({ classData }) => {
             assignmentNumber,
             assignmentName,
             marks,
+            fileName,
             deadline,
             type,
             downloadURL,

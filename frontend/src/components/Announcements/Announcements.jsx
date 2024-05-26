@@ -29,7 +29,7 @@ const Announcements = ({ classData }) => {
     console.log(announcement);
 
     return (
-        <div className='flex flex-col gap-3'>
+        <div className='flex flex-col gap-3 mb-8'>
             {announcement.map((item) => (
                 <div key={item.id} className="w-full bg-white sm:p-4 border-2 rounded-md">
                     <div className="flex gap-4 sm:pb-4 items-center">
@@ -42,7 +42,7 @@ const Announcements = ({ classData }) => {
                     {/* <img src={item.imageUrl} alt={item.text} width={200} /> */}
                     <a target='_blank' href={item.imageUrl} className="border-2 w-[22rem] flex gap-4 items-center rounded-md p-2">
                         <img src="/doc-img.png" alt="" width={28} />
-                        <p>Attached File: <span className='text-decoration-line: underline'>{item.text}</span> </p>
+                        <p>Attached File: <span className='text-decoration-line: underline'>{item.fileName || item.text}</span> </p>
                     </a>
                 </div>
             ))}

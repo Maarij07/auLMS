@@ -27,6 +27,7 @@ import ProjectForm from '../ProjectForm/ProjectForm';
 import { MainTabs } from '../index';
 import { FaExchangeAlt } from "react-icons/fa";
 import { CiViewTable } from "react-icons/ci";
+import ClassWork from '../ClassWork/ClassWork';
 
 const Main = ({ classData }) => {
     console.log(classData.assignmentWeightage);
@@ -93,6 +94,7 @@ const Main = ({ classData }) => {
         }
 
         console.log("Reference created");
+        const fileName=file.name;
         const uploadFile = ref(storage, `files/${file.name}`);
         const uploadPost = uploadBytesResumable(uploadFile, file);
         setShowInput(false);
@@ -118,6 +120,7 @@ const Main = ({ classData }) => {
                         const docData = {
                             timestamp: time.seconds,
                             imageUrl: downloadURL,
+                            fileName:fileName,
                             text: inputValue,
                             sender: loggedInMail
                         };
@@ -129,6 +132,11 @@ const Main = ({ classData }) => {
                             .catch((error) => {
                                 console.error('Error writing document:', error);
                             });
+                        const reDoc=doc(db,`Classes/${classData.id}`)
+                        const refData={
+                            posts:newCount
+                        }
+                        updateDoc(reDoc,refData);
                         return newCount;  // Return the updated count
                     });
                     const id = classData.id;
@@ -351,7 +359,7 @@ const Main = ({ classData }) => {
                 </div>
             </div>
         },
-        { id: 'classWork', title: 'Classwork', content: <p>Content for Classwork</p> },
+        { id: 'classWork', title: 'Classwork', content: <ClassWork classData={classData}/> },
         {
             id: 'people', title: `Students (${memberNos})`, content:
                 <div className="flex flex-col gap-4 overflow-hidden">

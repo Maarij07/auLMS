@@ -60,6 +60,11 @@ const Sidebar = () => {
                     <span>MarkSheets</span>
                     {/* <Link to='/call?roomID=hNYiz' >Hell2</Link> */}
                 </div>
+                <div className="flex items-center gap-2">
+                    <MdOutlineVideoCameraFront />
+                    <span>Activity</span>
+                    {/* <Link to='/call?roomID=hNYiz' >Hell2</Link> */}
+                </div>
                 <Link to='/settings' className="flex items-center gap-2">
                     <IoSettingsOutline />
                     <span>Settings</span>
