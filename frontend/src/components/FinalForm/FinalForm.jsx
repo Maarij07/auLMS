@@ -11,11 +11,9 @@ import { addDoc, collection, doc, Timestamp, setDoc } from 'firebase/firestore';
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-
-const AssignmentForm = ({ classData }) => {
-    const { assignmentDialog, setAssignmentDialog, loggedInMail } = useLocalContext();
-    const [assignmentNumber, setAssignmentNumber] = useState('');
-    const [assignmentName, setAssignmentName] = useState('');
+const FinalForm = ({classData}) => {
+    const { finalDialog, setFinalDialog, loggedInMail } = useLocalContext();
+    const [finalName, setFinalName] = useState('');
     const [marks, setMarks] = useState('');
     const [deadline, setDeadline] = useState('');
     const [type, setType] = useState('Individual');
@@ -32,7 +30,7 @@ const AssignmentForm = ({ classData }) => {
 
         let downloadURL = '';
         if (file) {
-            const storageRef = ref(storage, `assignments/${file.name}`);
+            const storageRef = ref(storage, `finals/${file.name}`);
             const uploadTask = uploadBytesResumable(storageRef, file);
             await uploadTask;
 
@@ -40,10 +38,9 @@ const AssignmentForm = ({ classData }) => {
         }
 
         // Add assignment data to Firestore
-        const assignmentRef = doc(db, `Classes/${classData.id}/Assignments/${assignmentNumber}`);
+        const assignmentRef = doc(db, `Classes/${classData.id}/Finals/paper`);
         const assignmentData = {
-            assignmentNumber,
-            assignmentName,
+            finalName,
             marks,
             deadline,
             type,
@@ -52,20 +49,19 @@ const AssignmentForm = ({ classData }) => {
         await setDoc(assignmentRef, assignmentData);
 
         // Clear form fields after submission
-        setAssignmentNumber('');
-        setAssignmentName('');
+        setFinalName('');
         setMarks('');
         setDeadline('');
         setType('Individual');
         setFile(null);
-        setAssignmentDialog(false)
+        setFinalDialog(false)
     };
 
     return (
 
-        <Dialog fullScreen open={assignmentDialog} onClose={() => setAssignmentDialog(false)} TransitionComponent={Transition}>
+        <Dialog fullScreen open={finalDialog} onClose={() => setFinalDialog(false)} TransitionComponent={Transition}>
             <div className="flex w-full justify-between p-4 border-b-2 border-[#cfcecd] shadow-sm" >
-                <div className="joinClass cursor-pointer" onClick={() => setAssignmentDialog(false)}>
+                <div className="joinClass cursor-pointer" onClick={() => setFinalDialog(false)}>
                     <Close />
                 </div>
                 {/* <Button onClick={() => { }} className='font-bold' variant="contained" color="primary">
@@ -73,17 +69,11 @@ const AssignmentForm = ({ classData }) => {
                         </Button> */}
             </div>
             <form onSubmit={handleSubmit} className='flex flex-col mt-[4rem] mx-[7rem] gap-4'>
-                <h1 className='text-3xl font-bold'>AssignmentForm</h1>
+                <h1 className='text-3xl font-bold'>Upload Final paper</h1>
                 <TextField
-                    label="Assignment Number"
-                    value={assignmentNumber}
-                    onChange={(e) => setAssignmentNumber(e.target.value)}
-                    required
-                />
-                <TextField
-                    label="Assignment Name"
-                    value={assignmentName}
-                    onChange={(e) => setAssignmentName(e.target.value)}
+                    label="final Name"
+                    value={finalName}
+                    onChange={(e) => setFinalName(e.target.value)}
                     required
                 />
                 <TextField
@@ -115,6 +105,7 @@ const AssignmentForm = ({ classData }) => {
             </form>
         </Dialog>
     );
-};
+}
 
-export default AssignmentForm;
+export default FinalForm
+

@@ -13,6 +13,10 @@ export function ContextProvider({children}){
     const [loggedInMail,setLoggedInMail] = useState(null);
     const [callClass,setCallClass] = useState(null);
     const [assignmentDialog,setAssignmentDialog]=useState(false);
+    const [quizDialog,setQuizDialog]=useState(false);
+    const [midsDialog,setMidsDialog]=useState(false);
+    const [finalDialog,setFinalDialog]=useState(false);
+    const [projectDialog,setProjectDialog]=useState(false);
     
     const login =()=>{
         auth.signInWithPopup(provider);
@@ -48,7 +52,15 @@ export function ContextProvider({children}){
         callClass,
         setCallClass,
         assignmentDialog,
-        setAssignmentDialog
+        setAssignmentDialog,
+        quizDialog,
+        setQuizDialog,
+        midsDialog,
+        setMidsDialog,
+        finalDialog,
+        setFinalDialog,
+        projectDialog,
+        setProjectDialog
      };
 
     return <AddContext.Provider value={value} >{children}</AddContext.Provider>;

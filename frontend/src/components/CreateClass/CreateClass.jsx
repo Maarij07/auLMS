@@ -14,6 +14,7 @@ const createClass = () => {
     const addClass = (e) => {
         e.preventDefault();
         const id = uuidV4();
+        const modifiedEmail = loggedInMail.replace(/\./g, "_");
         const classData = {
             owner: loggedInMail,
             className: className,
@@ -25,7 +26,7 @@ const createClass = () => {
             quizNo:0,
             posts:0,
             call:null,
-            members:{[loggedInMail]:true},
+            members:{[modifiedEmail]:true},
             assignmentWeightage:0,
             quizWeightage:0,
             midsWeightage:0,

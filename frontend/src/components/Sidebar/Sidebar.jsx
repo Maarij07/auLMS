@@ -33,6 +33,7 @@ const Sidebar = () => {
     function confirmLogout() {
         signOut(auth).then(() => {
             dispatch(setUser(null))
+            Navigate('/');
         }).catch((error) => {
             console.log(error);
         });

@@ -19,3 +19,4 @@ export {default as AssignmentForm} from './AssignmentForm/AssignmentForm.jsx';
 export {default as MainTabs} from './MainTabs/MainTabs.jsx';
 export {default as PageNotFound} from './PageNotFound/PageNotFound.jsx';
 export {default as People} from './People/People.jsx';
+export {default as QuizForm} from './QuizForm/QuizForm.jsx';

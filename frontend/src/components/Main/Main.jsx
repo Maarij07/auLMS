@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import TopBar from '../TopBar/TopBar'
-import { Avatar, TextField, Button, Dialog, DialogActions, DialogTitle } from '@mui/material'
+import { Avatar, TextField, Button, Menu, Dialog, DialogActions, DialogTitle, Select, MenuItem, InputLabel, FormControl, DialogContent, Slide } from '@mui/material'
 import { useState } from 'react';
 import { storage } from '../../lib/firebase';
 import { getDownloadURL, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
@@ -9,7 +9,6 @@ import { collection, deleteDoc, doc, setDoc, Timestamp, addDoc, onSnapshot, quer
 import db from '../../lib/firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoMdMore } from "react-icons/io";
-import { Menu, MenuItem } from '@mui/material';
 import { GoPencil } from "react-icons/go";
 import { MdDeleteOutline } from "react-icons/md";
 import { useSelector, useDispatch } from 'react-redux';
@@ -21,7 +20,13 @@ import People from '../People/People';
 import Groups from '../Groups/Groups';
 import { FaPlus } from "react-icons/fa6";
 import AssignmentForm from '../AssignmentForm/AssignmentForm';
+import QuizForm from '../QuizForm/QuizForm';
+import MidsForm from '../MidsForm/MidsForm';
+import FinalForm from '../FinalForm/FinalForm';
+import ProjectForm from '../ProjectForm/ProjectForm';
 import { MainTabs } from '../index';
+import { FaExchangeAlt } from "react-icons/fa";
+import { CiViewTable } from "react-icons/ci";
 
 const Main = ({ classData }) => {
     console.log(classData.assignmentWeightage);
@@ -30,7 +35,8 @@ const Main = ({ classData }) => {
     const memberNos = memberEmails.length;
     console.log(memberEmails.length);
     const navigate = useNavigate();
-    const { loggedInMail, loggedInUser, setCallClass, callClass, setAssignmentDialog } = useLocalContext();
+
+    const { loggedInMail, loggedInUser, setCallClass, callClass, setAssignmentDialog,setMidsDialog,setFinalDialog, setProjectDialog,setQuizDialog } = useLocalContext();
     const [showInput, setShowInput] = useState(false);
     const [inputValue, setInputValue] = useState();
     const [file, setFile] = useState(null);
@@ -38,11 +44,13 @@ const Main = ({ classData }) => {
     const [gradeOpen, setGradeOpen] = useState(false)
     const currentUser = useSelector(SelectUsers);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [menuOpen, setMenuOpen] = useState(false);
     const handleClick = (event) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
     const currentMail = currentUser.currentUser.email
     const classOwnerMail = classData.owner
     const classId = classData.id
+
     const [className, setClassName] = useState(classData.className);
     const [courseName, setCourseName] = useState(classData.courseName);
     const [creditHours, setCreditHours] = useState(classData.creditHours);
@@ -58,8 +66,16 @@ const Main = ({ classData }) => {
     const [callLink, setCallLink] = useState(null);
     const [assignmentCount, setAssignmentCount] = useState(classData.assignmentNo);
     const [quizCount, setQuizCount] = useState(classData.quizNo);
+    const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+    const [transferEmail, setTransferEmail] = useState('');
 
-    console.log(classData.call);
+    const handleTransferDialogOpen = () => {
+        setTransferDialogOpen(true);
+    };
+
+    const handleTransferDialogClose = () => {
+        setTransferDialogOpen(false);
+    };
 
     const handleCloseAssignment = () => setAssignmentEl(null);
     console.log(postCount);
@@ -157,16 +173,18 @@ const Main = ({ classData }) => {
             },
             id: id
         };
-        setDoc(mainDoc, docData, { merge: true });
+        updateDoc(mainDoc, docData, { merge: true });
         setEditOpen(false);
         navigate('/');
     }
     useEffect(() => {
-        setTotalWeightage(parseInt(assignmentWeightage) + parseInt(quizWeightage) + parseInt(midsWeightage) + parseInt(finalWeightage) + parseInt(projectWeightage))
-        // console.log(totalWeightage);
-        if (totalWeightage == 100)
-            setDisabled(false)
-
+        function calculateTotal() {
+            setTotalWeightage(parseInt(assignmentWeightage) + parseInt(quizWeightage) + parseInt(midsWeightage) + parseInt(finalWeightage) + parseInt(projectWeightage))
+            // console.log(totalWeightage);
+            if (totalWeightage == 100) setDisabled(false)
+            // else setDisabled(true);
+        }
+        calculateTotal();
     }, [assignmentWeightage, quizWeightage, midsWeightage, finalWeightage, projectWeightage])
 
     const gradeClass = (e) => {
@@ -223,6 +241,32 @@ const Main = ({ classData }) => {
         }
     };
 
+    const transferClass = async () => {
+        try {
+            const classRef = doc(db, `Classes/${classId}`);
+
+            const classSnap = await getDoc(classRef);
+
+            if (classSnap.exists()) {
+                const currentData = classSnap.data();
+
+                // Update the owner and members
+                await updateDoc(classRef, {
+                    owner: transferEmail,
+                    [`members.${transferEmail}`]: currentData.members[loggedInMail],
+                    [`members.${loggedInMail}`]: deleteDoc()
+                });
+
+                setTransferDialogOpen(false);
+                navigate('/');
+            } else {
+                console.error("No such document!");
+            }
+        } catch (error) {
+            console.error("Error transferring class:", error);
+        }
+    };
+
     useEffect(() => {
         const callRef = collection(db, `Classes`);
         const unsubscribe = onSnapshot(callRef, (querySnapshot) => {
@@ -265,6 +309,16 @@ const Main = ({ classData }) => {
             console.log(doc.id, " => ", doc.data());
         })
     }
+
+    const handleMenuClick = () => {
+        setMenuOpen(!menuOpen);
+    };
+
+    const handleMenuOptionClick = (dialogSetter) => {
+        dialogSetter(true);
+        setMenuOpen(false);
+    };
+
     const tabs = [
         {
             id: 'announcements', title: 'Announcements',
@@ -299,7 +353,7 @@ const Main = ({ classData }) => {
         },
         { id: 'classWork', title: 'Classwork', content: <p>Content for Classwork</p> },
         {
-            id: 'people', title: `Students (${memberNos - 1})`, content:
+            id: 'people', title: `Students (${memberNos})`, content:
                 <div className="flex flex-col gap-4 overflow-hidden">
                     <div className="w-full flex flex-col gap-2 sm:w-[53rem] ">
                         <People classData={memberEmails} />
@@ -332,6 +386,8 @@ const Main = ({ classData }) => {
                             >
                                 <MenuItem onClick={() => setGradeOpen(true)}><AiOutlinePieChart />&nbsp;Grading</MenuItem>
                                 <MenuItem onClick={() => setEditOpen(true)}><GoPencil />&nbsp;Edit Class</MenuItem>
+                                <MenuItem onClick={handleTransferDialogOpen}><FaExchangeAlt />&nbsp;Transfer Class</MenuItem>
+                                <MenuItem onClick={() => { }}><CiViewTable />&nbsp;Mark Sheet</MenuItem>
                                 <MenuItem onClick={handleDelete}><MdDeleteOutline />&nbsp;Delete Class</MenuItem>
                             </Menu>
                         </div>
@@ -345,6 +401,7 @@ const Main = ({ classData }) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
+                                <MenuItem onClick={() => { }}><CiViewTable />&nbsp;Mark Sheet</MenuItem>
                                 <MenuItem onClick={leaveClass}><IoExitOutline />&nbsp;Leave Class</MenuItem>
                             </Menu>
                         </div>
@@ -368,7 +425,16 @@ const Main = ({ classData }) => {
                     <MainTabs tabs={tabs} />
                 </div>
             </div>
-            <button onClick={handleAssignment} className='rounded-full shadow-xl font-extralight border-2 text-3xl p-3 fixed bottom-7 right-7' ><FaPlus /></button>
+            <button onClick={handleMenuClick} className='rounded-full shadow-xl font-extralight border-2 text-3xl p-3 fixed bottom-7 right-7' ><FaPlus /></button>
+            {menuOpen && (
+                <div className=' bg-[#f0f0f0] w-[10rem] absolute bottom-[3.7rem] right-[3.6rem]'>
+                    <MenuItem onClick={() => handleMenuOptionClick(setAssignmentDialog)}>Assignments</MenuItem>
+                    <MenuItem onClick={() => handleMenuOptionClick(setQuizDialog)}>Quizzes</MenuItem>
+                    <MenuItem onClick={() => handleMenuOptionClick(setMidsDialog)}>Mids</MenuItem>
+                    <MenuItem onClick={() => handleMenuOptionClick(setFinalDialog)}>Finals</MenuItem>
+                    <MenuItem onClick={() => handleMenuOptionClick(setProjectDialog)}>Projects</MenuItem>
+                </div>
+            )}
             <Dialog
                 open={editOpen}
                 onClose={() => setEditOpen(false)}
@@ -409,7 +475,37 @@ const Main = ({ classData }) => {
                     </DialogActions>
                 </div>
             </Dialog>
+            <Dialog open={transferDialogOpen} onClose={handleTransferDialogClose}>
+                <DialogTitle>Transfer Class Ownership</DialogTitle>
+                <FormControl fullWidth margin="normal">
+                    <InputLabel id="transfer-label">Select Member</InputLabel>
+                    <Select
+                        labelId="transfer-label"
+                        id="transfer-select"
+                        value={transferEmail}
+                        onChange={(e) => setTransferEmail(e.target.value)}
+                    >
+                        {memberEmails.map((email) => (
+                            <MenuItem key={email} value={email}>
+                                {members[email]}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <DialogActions>
+                    <Button onClick={handleTransferDialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={transferClass} color="primary">
+                        Transfer
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <AssignmentForm classData={classData} />
+            <QuizForm classData={classData} />
+            <MidsForm classData={classData} />
+            <FinalForm classData={classData} />
+            <ProjectForm classData={classData} />
         </div>
     );
 }
