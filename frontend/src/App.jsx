@@ -88,7 +88,11 @@ function App() {
     fetchClassData();
   }, [createdClasses, joinedClasses]);
 
-  if (user.currentUser) {
+  if(!loggedInMail){
+    return <div>Loading...</div>
+  }
+
+  if (user.currentUser||loggedInMail) {
     return (
       <BrowserRouter>
         <Routes>
