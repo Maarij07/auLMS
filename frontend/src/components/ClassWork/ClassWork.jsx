@@ -11,7 +11,7 @@ const ClassWork = ({ classData }) => {
     };
 
     const accordionItems = [
-        { title: 'Assignment', content: <Assignments classData={classData} /> },
+        { title: 'Assignments', content: <Assignments classData={classData} /> },
         { title: 'Quiz', content: <Quiz classData={classData} />},
         { title: 'Mids', content: <Mids classData={classData} />},
         { title: 'Final', content: <Finals classData={classData}/>},

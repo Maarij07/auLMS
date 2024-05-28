@@ -86,7 +86,7 @@ const Home = ({ children }) => {
                 <div className="bg-[#f0f0f0] fixed right-0 h-screen w-[17.5rem] flex flex-col justify-between py-8 px-6">
                     <div className="flex justify-end items-center gap-4">
                         <div className="text-right">
-                            <h1 className="font-bold leading-4 text-xl">{currentUser?.currentUser.name || altName }</h1>
+                            <h1 className="font-bold leading-4 text-xl">{currentUser?.currentUser?.name || altName }</h1>
                             <p>{studentId}</p>
                         </div>
                         <div className="h-full">

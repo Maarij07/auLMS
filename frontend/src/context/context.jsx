@@ -17,6 +17,7 @@ export function ContextProvider({children}){
     const [midsDialog,setMidsDialog]=useState(false);
     const [finalDialog,setFinalDialog]=useState(false);
     const [projectDialog,setProjectDialog]=useState(false);
+    const [submissionDialog,setSubmissionDialog] = useState(false);
     
     const login =()=>{
         auth.signInWithPopup(provider);
@@ -60,7 +61,9 @@ export function ContextProvider({children}){
         finalDialog,
         setFinalDialog,
         projectDialog,
-        setProjectDialog
+        setProjectDialog,
+        submissionDialog,
+        setSubmissionDialog
      };
 
     return <AddContext.Provider value={value} >{children}</AddContext.Provider>;

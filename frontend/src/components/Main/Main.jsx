@@ -7,7 +7,7 @@ import { getDownloadURL, ref, uploadBytes, uploadBytesResumable } from 'firebase
 import { useLocalContext } from '../../context/context';
 import { collection, deleteDoc, doc, setDoc, Timestamp, addDoc, onSnapshot, query, where, getDocs, getDoc, updateDoc } from 'firebase/firestore';
 import db from '../../lib/firebase';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { IoMdMore } from "react-icons/io";
 import { GoPencil } from "react-icons/go";
 import { MdDeleteOutline } from "react-icons/md";
@@ -29,15 +29,35 @@ import { FaExchangeAlt } from "react-icons/fa";
 import { CiViewTable } from "react-icons/ci";
 import ClassWork from '../ClassWork/ClassWork';
 
-const Main = ({ classData }) => {
-    console.log(classData.assignmentWeightage);
-    const members = classData.members;
+const Main = () => {
+    const [mainData, setMainData] = useState({});
+    // console.log(mainData.assignmentWeightage);
+    // const members = mainData.members;
+    const members = {};
     const memberEmails = Object.keys(members);
     const memberNos = memberEmails.length;
     console.log(memberEmails.length);
     const navigate = useNavigate();
+    const { newId } = useParams();
+    useEffect(() => {
+        const fetchData = async () => {
+            const q = query(collection(db, 'Classes'), where("id", '==', `${newId}`))
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                // console.log(mainData);
+                setMainData(doc.data());
+                console.log(doc.id, " => ", doc.data());
+            });
+        }
+        // console.log(mainData);
+        fetchData();
+    }, [newId])
 
-    const { loggedInMail, loggedInUser, setCallClass, callClass, setAssignmentDialog,setMidsDialog,setFinalDialog, setProjectDialog,setQuizDialog } = useLocalContext();
+    useEffect(() => {
+        console.log(mainData);
+    }, [mainData])
+
+    const { loggedInMail, loggedInUser, setCallClass, callClass, setAssignmentDialog, setMidsDialog, setFinalDialog, setProjectDialog, setQuizDialog } = useLocalContext();
     const [showInput, setShowInput] = useState(false);
     const [inputValue, setInputValue] = useState();
     const [file, setFile] = useState(null);
@@ -49,24 +69,36 @@ const Main = ({ classData }) => {
     const handleClick = (event) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
     const currentMail = currentUser.currentUser.email
-    const classOwnerMail = classData.owner
-    const classId = classData.id
+    const classOwnerMail = mainData.owner
+    const classId = mainData.id
 
-    const [className, setClassName] = useState(classData.className);
-    const [courseName, setCourseName] = useState(classData.courseName);
-    const [creditHours, setCreditHours] = useState(classData.creditHours);
-    const [assignmentWeightage, setAssignmentWeightage] = useState(classData.assignmentWeightage);
-    const [quizWeightage, setQuizWeightage] = useState(classData.quizWeightage);
-    const [midsWeightage, setMidsWeightage] = useState(classData.midsWeightage);
-    const [finalWeightage, setFinalWeightage] = useState(classData.finalWeightage);
-    const [projectWeightage, setProjectWeightage] = useState(classData.projectWeightage);
+    //classdata
+    // const [className, setClassName] = useState(mainData?.className);
+    const [className, setClassName] = useState('');
+    // const [courseName, setCourseName] = useState(mainData.courseName);
+    const [courseName, setCourseName] = useState('');
+    // const [creditHours, setCreditHours] = useState(mainData.creditHours);
+    const [creditHours, setCreditHours] = useState('');
+    // const [assignmentWeightage, setAssignmentWeightage] = useState(mainData.assignmentWeightage);
+    const [assignmentWeightage, setAssignmentWeightage] = useState('');
+    // const [quizWeightage, setQuizWeightage] = useState(mainData.quizWeightage);
+    const [quizWeightage, setQuizWeightage] = useState('');
+    // const [midsWeightage, setMidsWeightage] = useState(mainData.midsWeightage);
+    const [midsWeightage, setMidsWeightage] = useState('');
+    // const [finalWeightage, setFinalWeightage] = useState(mainData.finalWeightage);
+    const [finalWeightage, setFinalWeightage] = useState('');
+    // const [projectWeightage, setProjectWeightage] = useState(mainData.projectWeightage);
+    const [projectWeightage, setProjectWeightage] = useState('');
     const [totalWeightage, setTotalWeightage] = useState(0);
     const [disabled, setDisabled] = useState(true);
-    const [postCount, setPostCount] = useState(classData.posts);
+    // const [postCount, setPostCount] = useState(mainData.posts);
+    const [postCount, setPostCount] = useState('');
     const [assignmentEl, setAssignmentEl] = useState(null);
     const [callLink, setCallLink] = useState(null);
-    const [assignmentCount, setAssignmentCount] = useState(classData.assignmentNo);
-    const [quizCount, setQuizCount] = useState(classData.quizNo);
+    // const [assignmentCount, setAssignmentCount] = useState(mainData.assignmentNo);
+    const [assignmentCount, setAssignmentCount] = useState('');
+    // const [quizCount, setQuizCount] = useState(mainData.quizNo);
+    const [quizCount, setQuizCount] = useState('');
     const [transferDialogOpen, setTransferDialogOpen] = useState(false);
     const [transferEmail, setTransferEmail] = useState('');
 
@@ -94,7 +126,7 @@ const Main = ({ classData }) => {
         }
 
         console.log("Reference created");
-        const fileName=file.name;
+        const fileName = file.name;
         const uploadFile = ref(storage, `files/${file.name}`);
         const uploadPost = uploadBytesResumable(uploadFile, file);
         setShowInput(false);
@@ -115,12 +147,12 @@ const Main = ({ classData }) => {
                     setPostCount((prevCount) => {
                         const newCount = prevCount + 1;
                         const mainDoc = doc(db, 'announcments/classes');
-                        const childDoc = doc(mainDoc, `${classData.id}/${newCount}`);
+                        const childDoc = doc(mainDoc, `${mainData.id}/${newCount}`);
                         const time = Timestamp.fromDate(new Date());
                         const docData = {
                             timestamp: time.seconds,
                             imageUrl: downloadURL,
-                            fileName:fileName,
+                            fileName: fileName,
                             text: inputValue,
                             sender: loggedInMail
                         };
@@ -132,14 +164,14 @@ const Main = ({ classData }) => {
                             .catch((error) => {
                                 console.error('Error writing document:', error);
                             });
-                        const reDoc=doc(db,`Classes/${classData.id}`)
-                        const refData={
-                            posts:newCount
+                        const reDoc = doc(db, `Classes/${mainData.id}`)
+                        const refData = {
+                            posts: newCount
                         }
-                        updateDoc(reDoc,refData);
+                        updateDoc(reDoc, refData);
                         return newCount;  // Return the updated count
                     });
-                    const id = classData.id;
+                    const id = mainData.id;
                     const mainDoc = doc(db, `CreatedClasses/${loggedInMail}`);
                     const childDoc = doc(mainDoc, `classes/${id}`);
                     const docData = {
@@ -166,7 +198,7 @@ const Main = ({ classData }) => {
     }
     const editClass = (e) => {
         e.preventDefault();
-        const id = classData.id;
+        const id = mainData.id;
         const mainDoc = doc(db, `Classes/${id}`);
         // const childDoc = doc(mainDoc, `classes/${id}`);
         const docData = {
@@ -197,7 +229,7 @@ const Main = ({ classData }) => {
 
     const gradeClass = (e) => {
         e.preventDefault()
-        const id = classData.id;
+        const id = mainData.id;
         const mainDoc = doc(db, `Classes/${id}`);
         const docData = {
             assignmentWeightage: assignmentWeightage,
@@ -219,11 +251,11 @@ const Main = ({ classData }) => {
         e.preventDefault();
 
         try {
-            const userJoinedClassRef = doc(db, `UserClasses/${loggedInMail}/joinedClasses/${classData.id}`);
+            const userJoinedClassRef = doc(db, `UserClasses/${loggedInMail}/joinedClasses/${mainData.id}`);
 
             await deleteDoc(userJoinedClassRef);
 
-            const classRef = doc(db, `Classes/${classData.id}`);
+            const classRef = doc(db, `Classes/${mainData.id}`);
             const classDoc = await getDoc(classRef);
 
             if (classDoc.exists()) {
@@ -288,7 +320,7 @@ const Main = ({ classData }) => {
                 });
             });
             // console.log(documentsData);
-            const filteredArray = documentsData.filter(doc => doc.id === classData.id);
+            const filteredArray = documentsData.filter(doc => doc.id === mainData.id);
             // setCreatedClasses(filteredArray
             console.log(filteredArray);
 
@@ -311,7 +343,7 @@ const Main = ({ classData }) => {
         console.log("hide called")
         const mail = '221803@students.au.edu.pk'
         const qRef = collection(db, `JoinedClasses/${mail}/classes`);
-        const q = query(qRef, where("owner", "!=", `${classData.owner}`));
+        const q = query(qRef, where("owner", "!=", `${mainData.owner}`));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
             console.log(doc.id, " => ", doc.data());
@@ -355,11 +387,11 @@ const Main = ({ classData }) => {
                     </div>
 
                 </div>
-                <div className="w-full flex flex-col gap-2 sm:w-[53rem] "><Announcements classData={classData} />
+                <div className="w-full flex flex-col gap-2 sm:w-[53rem] "><Announcements mainData={mainData} />
                 </div>
             </div>
         },
-        { id: 'classWork', title: 'Classwork', content: <ClassWork classData={classData}/> },
+        { id: 'classWork', title: 'Classwork', content: <ClassWork classData={mainData} /> },
         {
             id: 'people', title: `Students (${memberNos})`, content:
                 <div className="flex flex-col gap-4 overflow-hidden">
@@ -368,7 +400,7 @@ const Main = ({ classData }) => {
                     </div>
                 </div>
         },
-        { id: 'group', title: 'Group', content: <Groups classData={classData} /> },
+        { id: 'group', title: 'Group', content: <Groups classData={mainData} /> },
     ];
 
     return (
@@ -377,10 +409,10 @@ const Main = ({ classData }) => {
             <div className="flex mt-[6rem] flex-col gap-6  items-center pt-[1.2rem] w-full ">
                 <div className="rounded-md bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white w-[30rem] sm:w-[70rem] sm:h-[11rem] flex justify-between p-6">
                     <div>
-                        <h1 className='font-bold text-3xl sm:text-4xl'>{classData.courseName}</h1>
-                        <h1 className='mt-[0.2rem]'>{classData.className} {classData.section}</h1>
+                        <h1 className='font-bold text-3xl sm:text-4xl'>{mainData.courseName}</h1>
+                        <h1 className='mt-[0.2rem]'>{mainData.className} {mainData.section}</h1>
                         <h2 className='font-bold text-sm mt-3'>Class Code:</h2>
-                        <h2>{classData.id}</h2>
+                        <h2>{mainData.id}</h2>
                     </div>
                     {currentMail === classOwnerMail ? (
                         <div className="text-4xl cursor-pointer">
@@ -423,17 +455,17 @@ const Main = ({ classData }) => {
                         </div>
                         <div className="border-2 p-4 flex flex-col items-center gap-2 rounded-md">
                             <h1 className='text-md font-semibold'>AU Meet</h1>
-                            {classData.call ? (
-                                <Link onClick={() => setCallClass(classData.id)} to={classData.call} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Join Now</Link>
+                            {mainData.call ? (
+                                <Link onClick={() => setCallClass(mainData.id)} to={mainData.call} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Join Now</Link>
                             ) : (
-                                <Link to='/call' onClick={() => setCallClass(classData.id)} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Create Now</Link>
+                                <Link to='/call' onClick={() => setCallClass(mainData.id)} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Create Now</Link>
                             )}
                         </div>
                     </div>
                     <MainTabs tabs={tabs} />
                 </div>
             </div>
-            <button onClick={handleMenuClick} className='rounded-full shadow-xl font-extralight border-2 text-3xl p-3 fixed bottom-7 right-7' ><FaPlus /></button>
+            {mainData.owner === loggedInMail && <button onClick={handleMenuClick} className='rounded-full shadow-xl font-extralight border-2 text-3xl p-3 fixed bottom-7 right-7' ><FaPlus /></button>}
             {menuOpen && (
                 <div className=' bg-[#f0f0f0] w-[10rem] absolute bottom-[3.7rem] right-[3.6rem]'>
                     <MenuItem onClick={() => handleMenuOptionClick(setAssignmentDialog)}>Assignments</MenuItem>
@@ -509,11 +541,11 @@ const Main = ({ classData }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <AssignmentForm classData={classData} />
-            <QuizForm classData={classData} />
-            <MidsForm classData={classData} />
-            <FinalForm classData={classData} />
-            <ProjectForm classData={classData} />
+            <AssignmentForm classData={mainData} />
+            <QuizForm classData={mainData} />
+            <MidsForm classData={mainData} />
+            <FinalForm classData={mainData} />
+            <ProjectForm classData={mainData} />
         </div>
     );
 }

@@ -12,9 +12,9 @@ export default function ClassCard({ classData }) {
                     <img src="/class-logo.svg" alt="" className='' width={300} />
                 </div>
                 <div className="flex flex-col">
-                    <Link  to={`/${classData.id}`} className='font-bold text-xl'>{classData.courseName}</Link>
+                    <Link  to={`/class/${classData.id}`} className='font-bold text-xl'>{classData.courseName}</Link>
                     <p className='font-extralight text-sm mt-2'>Unlock knowledge and explore the world of {classData.courseName} in this interactive class.</p>
-                    <Link className="flex w-full mt-2 justify-end gap-2" to={`/${classData.id}`}>
+                    <Link className="flex w-full mt-2 justify-end gap-2" to={`/class/${classData.id}`}>
                         <p>Teacher: <span className='font-bold '>{classData.teacher}</span></p>
                         <button className='bg-[#032B44] rounded-full px-2 text-white'><LiaGreaterThanSolid /></button>
                     </Link>

@@ -67,7 +67,7 @@ const Sidebar = () => {
                 </div>
                 <Link to='/settings' className="flex items-center gap-2">
                     <IoSettingsOutline />
-                    <span>Settings</span>
+                    <span>Profile</span>
                 </Link>
             </div>
             <div className="flex items-center gap-2" onClick={handleLogout}>
