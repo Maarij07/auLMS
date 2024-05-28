@@ -456,7 +456,7 @@ const Main = () => {
                         <div className="border-2 p-4 flex flex-col items-center gap-2 rounded-md">
                             <h1 className='text-md font-semibold'>AU Meet</h1>
                             {mainData.call ? (
-                                <Link onClick={() => setCallClass(mainData.id)} to={mainData.call} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Join Now</Link>
+                                <Link to={mainData.call} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Join Now</Link>
                             ) : (
                                 <Link to='/call' onClick={() => setCallClass(mainData.id)} className='bg-gradient-to-r from-[#07314B] via-[#1f5374] to-[#1174b1] text-white font-bold text-lg text-center px-3 py-2 rounded-md w-[10rem]'>Create Now</Link>
                             )}
