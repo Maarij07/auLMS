@@ -60,10 +60,10 @@ const Home = ({ children }) => {
             const email = currentUser.currentUser.email;
             const atIndex = email.indexOf('@');
             const beforeAt = email.substring(0, atIndex);
-            setAltName(beforeAt);
+            // setAltName(beforeAt);
             const isNotNumeric = /\D/.test(beforeAt); // Checks if any character before @ is non-numeric
             if (isNotNumeric) {
-                setStudentId(null);
+                setStudentId('Invalid Email');
             } else {
                 setStudentId(beforeAt);
             }
@@ -86,8 +86,8 @@ const Home = ({ children }) => {
                 <div className="bg-[#f0f0f0] fixed right-0 h-screen w-[17.5rem] flex flex-col justify-between py-8 px-6">
                     <div className="flex justify-end items-center gap-4">
                         <div className="text-right">
-                            <h1 className="font-bold leading-4 text-xl">{currentUser?.currentUser?.name || altName }</h1>
-                            <p>{studentId}</p>
+                            <h1 className="font-bold leading-4 text-xl">{currentUser?.currentUser?.displayName|| altName }</h1>
+                            <p>{currentUser?.currentUser?.regId||studentId}</p>
                         </div>
                         <div className="h-full">
                             <Avatar src={currentUser?.currentUser?.photo} sx={{ width: 39, height: 39 }} />

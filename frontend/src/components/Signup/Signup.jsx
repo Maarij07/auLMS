@@ -4,9 +4,10 @@ import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FaGoogle } from "react-icons/fa";
-import { auth } from '../../lib/firebase';
+import db, { auth } from '../../lib/firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { Link, useNavigate } from 'react-router-dom';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function Signup() {
     const navigate=useNavigate();
@@ -47,6 +48,14 @@ export default function Signup() {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             dispatch(setUser({ id: user.uid, email: user.email,displayName:userCredentials.userName,regId: userCredentials.studentId }));
+            const mainDoc=doc(db,`Users/${user.email}`)
+            const docData={
+                userId:userCredentials.studentId,
+                email:user.email,
+                name:userCredentials.userName,
+                password:userCredentials.password
+            }
+            setDoc(mainDoc,docData);
             navigate('/');
         }
         else {
@@ -67,6 +76,9 @@ export default function Signup() {
             setError("Please use an educational email");
         } else {
             createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
+                .then(()=>{
+
+                })
                 .catch((error) => {
                     setError(error.message)
                 });
