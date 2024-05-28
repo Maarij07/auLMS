@@ -10,7 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
 
 export default function Signup() {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const provider = new GoogleAuthProvider();
     const { login } = useLocalContext();
@@ -31,6 +31,17 @@ export default function Signup() {
             .then((result) => {
                 const user = result.user;
                 const email = user.email;
+                const atIndex = email.indexOf('@');
+                const beforeAt = email.substring(0, atIndex);
+                const mainDoc = doc(db, `Users/${user.email}`)
+                const docData = {
+                    userId: beforeAt,
+                    Email: user.email,
+                    name: user.displayName,
+                    password: null
+                }
+                setDoc(mainDoc, docData);
+                navigate('/');
 
                 if (!checkEducationalEmail(email)) {
                     setError("Please use an educational email");
@@ -47,15 +58,15 @@ export default function Signup() {
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            dispatch(setUser({ id: user.uid, email: user.email,displayName:userCredentials.userName,regId: userCredentials.studentId }));
-            const mainDoc=doc(db,`Users/${user.email}`)
-            const docData={
-                userId:userCredentials.studentId,
-                email:user.email,
-                name:userCredentials.userName,
-                password:userCredentials.password
+            dispatch(setUser({ id: user.uid, email: user.email, displayName: userCredentials.userName, regId: userCredentials.studentId }));
+            const mainDoc = doc(db, `Users/${user.email}`)
+            const docData = {
+                userId: userCredentials.studentId,
+                Email: user.email,
+                name: userCredentials.userName,
+                password: userCredentials.password
             }
-            setDoc(mainDoc,docData);
+            setDoc(mainDoc, docData);
             navigate('/');
         }
         else {
@@ -76,7 +87,7 @@ export default function Signup() {
             setError("Please use an educational email");
         } else {
             createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
-                .then(()=>{
+                .then(() => {
 
                 })
                 .catch((error) => {
@@ -126,7 +137,7 @@ export default function Signup() {
                     <button className='flex gap-4 text-lg rounded-full items-center justify-center text-red-500 font-bold' onClick={handleGoogleLogin}><FaGoogle />Login With Google</button>
                 </form>
                 <div className=" text-sm ">
-                    <p>Already have an account? <Link className='text-blue-800 font-semibold text-decoration-line: underline'  to="/"> Login</Link> </p>
+                    <p>Already have an account? <Link className='text-blue-800 font-semibold text-decoration-line: underline' to="/"> Login</Link> </p>
                 </div>
             </div>
         </div>

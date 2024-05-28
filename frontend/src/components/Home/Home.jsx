@@ -49,8 +49,6 @@ const Navbar = () => {
 
 const Home = ({ children }) => {
     const { loggedInUser } = useLocalContext();
-    useEffect(() => {}, [loggedInUser]);
-
     const currentUser = useSelector(SelectUsers);
     const [studentId, setStudentId] = useState(null);
     const [altName,setAltName]=useState('My Account');
@@ -86,7 +84,7 @@ const Home = ({ children }) => {
                 <div className="bg-[#f0f0f0] fixed right-0 h-screen w-[17.5rem] flex flex-col justify-between py-8 px-6">
                     <div className="flex justify-end items-center gap-4">
                         <div className="text-right">
-                            <h1 className="font-bold leading-4 text-xl">{currentUser?.currentUser?.displayName|| altName }</h1>
+                            <h1 className="font-bold leading-4 text-xl">{currentUser?.currentUser?.displayName||currentUser?.currentUser?.name|| altName }</h1>
                             <p>{currentUser?.currentUser?.regId||studentId}</p>
                         </div>
                         <div className="h-full">
