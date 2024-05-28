@@ -18,16 +18,21 @@ const Assignments = ({ classData }) => {
     const [selectedAssignment, setSelectedAssignment] = useState(null);
     const [viewSubmissionsDialog, setViewSubmissionsDialog] = useState(false);
     const [assignmentNumber, setAssignmentNumber] = useState('');
+    const [totalMarks, setTotalMarks] = useState(0);
 
     useEffect(() => {
         const assignmentRef = collection(db, `Classes/${classData.id}/Assignments`);
         const unsubscribe = onSnapshot(assignmentRef, (querySnapshot) => {
             const documentsData = [];
             querySnapshot.forEach((doc) => {
-                documentsData.push({
+                const assignmentData = {
                     id: doc.id,
                     ...doc.data()
-                });
+                };
+                documentsData.push(assignmentData);
+                if (assignmentData.marks) {
+                    setTotalMarks(assignmentData.marks);
+                }
             });
             setAssignments(documentsData);
         });
@@ -57,7 +62,8 @@ const Assignments = ({ classData }) => {
                                 <p className='text-sm'>{item.type}</p>
                             </div>
                         </div>
-                        <div>
+                        <div className='text-right flex flex-col gap-2'>
+                            <p className='text-sm'>{item.marks} points</p>
                             <p className='text-sm'>{item.deadline}</p>
                         </div>
                     </div>
@@ -92,7 +98,7 @@ const Assignments = ({ classData }) => {
                         <Close />
                     </div>
                 </div>
-                <ViewSubmissions classData={classData} assignmentNumber={assignmentNumber} />
+                <ViewSubmissions classData={classData} totalMarks={totalMarks} assignmentNumber={assignmentNumber} />
             </Dialog>
         </>
     );
